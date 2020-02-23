@@ -1,0 +1,12 @@
+imports:
+    - path: sakila-vm-template.py
+    - path: startup-script.sh
+      name: startup-script.sh
+    
+resources:
+    - name: sakila-vm
+      type: sakila-vm-template.py
+      properties:
+        zone: us-central1-f
+        metadata-from-file:
+            startup-script: startup-script.sh
