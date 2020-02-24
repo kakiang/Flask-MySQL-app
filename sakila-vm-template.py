@@ -32,7 +32,7 @@ def generate_config(context):
         'properties': {
             'zone': context.properties['zone'],
             'machineType': zonal_compute_url(context.env['project'], context.properties['zone'],
-                                             'machineTypes', 'g1-small'),
+                                             'machineTypes', context.properties['machine-type']),
             'tags':{
                 'items': ['flask-mysql-server']
             },

@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo apt-get update
 # Install Stackdriver logging agent
 curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
 sudo bash install-logging-agent.sh
@@ -9,8 +10,6 @@ sudo apt-get install -yq git python python-pip
 pip install --upgrade pip virtualenv
 
 sudo cat > /etc/apt/sources.list.d/mysql.list <<EOF
-### THIS FILE IS AUTOMATICALLY CONFIGURED ###
-# You may comment out entries below, but any other modifications may be lost.
 # Use command 'dpkg-reconfigure mysql-apt-config' as root for modifications.
 deb http://repo.mysql.com/apt/debian/ stretch mysql-apt-config
 deb http://repo.mysql.com/apt/debian/ stretch mysql-5.7
@@ -42,32 +41,32 @@ echo "mysql-server-5.7 mysql-server/root_password_again password rootpassword" |
 # wget https://dev.mysql.com/get/mysql-apt-config_0.8.14-1_all.deb
 # sudo dpkg -i mysql-apt-config_0.8.14-1_all.deb
 sudo apt-get update
-sudo apt-get install -y mysql-server-5.7
+sudo apt-get install -y --allow-unauthenticated mysql-community-server
 
 # download sakila schema and data 
-wget https://downloads.mysql.com/docs/sakila-db.tar.gz
+wget https://downloads.mysql.com/docs/sakila-db.tar.gz -O /tmp/sakila-db.tar.gz
 # unzip
-tar -zxvf sakila-db.tar.gz
+tar -zxvf /tmp/sakila-db.tar.gz
 # create database schema
-mysql -uroot -prootpassword -e "SOURCE $HOME/sakila-db/sakila-schema.sql;"
+mysql -uroot -prootpassword -e "SOURCE sakila-db/sakila-schema.sql;"
 # populate the database with data
-mysql -uroot -prootpassword -e "SOURCE $HOME/sakila-db/sakila-data.sql;"
+mysql -uroot -prootpassword -e "SOURCE sakila-db/sakila-data.sql;"
 
 # Fetch source code
-git clone https://github.com/kakiang/sakila-flask-app.git
+git clone https://github.com/kakiang/sakila-flask-app.git /opt/apps/sakila-flask-app
 
 # Python environment setup
-virtualenv -p python3 sakila-flask-app/env
-source sakila-flask-app/env/bin/activate
-sakila-flask-app/env/bin/pip install -r sakila-flask-app/requirements.txt
+virtualenv -p python3 /opt/apps/sakila-flask-app/env
+source /opt/apps/sakila-flask-app/env/bin/activate
+/opt/apps/sakila-flask-app/env/bin/pip install -r /opt/apps/sakila-flask-app/requirements.txt
 
 sudo sed -i 's/127\.0\.0\.1/0\.0\.0\.0/g' /etc/mysql/mysql.conf.d/mysqld.cnf
 mysql -uroot -prootpassword -e 'USE mysql; UPDATE `user` SET `Host`="%" WHERE `User`="root" AND `Host`="localhost"; DELETE FROM `user` WHERE `Host` != "%" AND `User`="root"; FLUSH PRIVILEGES;'
 
 sudo service mysql restart
-# set env var to run flask
-export FLASK_APP=sakila-flask-app/run.py
+# set env vars to run flask
+export FLASK_APP=/opt/apps/sakila-flask-app/run.py
 export FLASK_DEBUG=1
 # run flask
-flask run --host=0.0.0.0
-# ~/.local/bin/gunicorn -b 0.0.0.0:5000 /opt/app/sakila-flask-app/run:app
+flask run --host=0.0.0.0 --port=80
+# ~/.local/bin/gunicorn -b 0.0.0.0:5000 /opt/apps/sakila-flask-app/run:app

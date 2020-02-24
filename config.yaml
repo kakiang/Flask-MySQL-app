@@ -8,5 +8,6 @@ resources:
       type: sakila-vm-template.py
       properties:
         zone: us-central1-f
+        machine-type: g1-small
         metadata-from-file:
             startup-script: startup-script.sh
