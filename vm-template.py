@@ -28,7 +28,7 @@ def generate_config(context):
 
     resources = [{
         'type': 'compute.v1.instance',
-        'name': 'sakila-vm',
+        'name': 'app-vm',
         'properties': {
             'zone': context.properties['zone'],
             'machineType': zonal_compute_url(context.env['project'], context.properties['zone'],
@@ -59,11 +59,11 @@ def generate_config(context):
     },
         {
         'type': 'compute.v1.firewall',
-        'name': 'sakila-app-firewall',
+        'name': 'app-firewall',
         'properties': {
             'allowed': [{
                 'IPProtocol': 'TCP',
-                'ports': ['80', '5000', '3306']
+                'ports': ['80']
             }],
             'sourceRanges': ['0.0.0.0/0'],
             'targetTags': ['flask-mysql-server']
