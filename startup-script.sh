@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Install Stackdriver logging agent
+# Stackdriver Logging agent streams logs from VM instances to Stackdriver Logging
 curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
 sudo bash install-logging-agent.sh
 
